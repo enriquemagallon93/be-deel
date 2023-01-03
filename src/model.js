@@ -1,8 +1,13 @@
+/* istanbul ignore file */
+
 const Sequelize = require('sequelize');
+
+const { DB_STORAGE = './database.sqlite3', NODE_ENV } = process.env;
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite3'
+  storage: DB_STORAGE,
+  logging: NODE_ENV !== 'test'
 });
 
 class Profile extends Sequelize.Model {}

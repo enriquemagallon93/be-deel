@@ -42,9 +42,9 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
         subQuery: false,
     });
 
-    const jobPlainData = jobToPay ? jobToPay.get({plain: true}) : undefined;
+    const jobPlainData = jobToPay.get({plain: true});
 
-    if (!jobPlainData || !jobPlainData.total_amount) return res.status(400).end(`You are not able to deposit money in your balance because you don't have unpaid jobs`)
+    if (!jobPlainData.total_amount) return res.status(400).end(`You are not able to deposit money in your balance because you don't have unpaid jobs`)
 
     const {
         total_amount: clientAmountToPay,

@@ -22,7 +22,6 @@ jobsRouter.get('/unpaid', async (req, res) =>{
             paid: sequelize.or(false, 0, null),
         }
     });
-    if(!jobs) return res.status(404).end()
     res.json(jobs)
 });
 
