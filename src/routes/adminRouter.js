@@ -1,6 +1,7 @@
 const express = require('express');
 const Sequelize = require('sequelize');
-const { sequelize } = require('../model')
+const { sequelize } = require('../model');
+const resetDatabase = require('../tools/reset-database');
 
 const adminRouter = express.Router();
 
@@ -75,6 +76,22 @@ adminRouter.get('/best-clients', async (req, res) => {
     });
 
     res.json(professions);
+});
+
+adminRouter.get('/profiles', async (req, res) => {
+    const { Profile } = req.app.get('models');
+
+    const profiles = await Profile.findAll({
+        attributes: ['id', [sequelize.literal("firstName || ' ' || lastName"), 'fullName'], 'profession','balance','type'],
+    });
+
+    res.json(profiles);
+});
+
+adminRouter.post('/reset-db', async (req, res) => {
+    await resetDatabase();
+
+    res.status(200).end();
 });
 
 module.exports = adminRouter;

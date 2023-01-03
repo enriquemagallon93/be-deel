@@ -1,6 +1,6 @@
 /* istanbul ignore file */
-import seed from '../../scripts/seedDb';
-import { sequelize } from '../model';
+const seed = require('../../scripts/seed');
+const { sequelize } = require('../model');
 
 const resetDatabase = async () => {
     try {
@@ -11,4 +11,4 @@ const resetDatabase = async () => {
     }
 };
 
-export default resetDatabase;
+module.exports= resetDatabase;
