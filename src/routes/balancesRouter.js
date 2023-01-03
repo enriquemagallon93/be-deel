@@ -1,6 +1,6 @@
 const express = require('express');
 const Sequelize = require('sequelize');
-const {sequelize} = require('../model')
+const { sequelize } = require('../model')
 const { getProfile } = require('../middleware/getProfile');
 
 const balancesRouter = express.Router();
@@ -14,7 +14,7 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
 
     if (user.id !== userId) return res.status(401).end();
 
-    if(user.type !== 'client') return res.status(404).end();
+    if (user.type !== 'client') return res.status(404).end();
 
     const [jobToPay] = await Job.findAll({
         where: {
@@ -29,7 +29,7 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
                 status: 'in_progress'
             },
             include: {
-                attribute:['id', 'balance'],
+                attribute: ['id', 'balance'],
                 model: Profile,
                 as: 'Client',
                 where: {
@@ -38,22 +38,22 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
                 }
             }
         },
-        attributes: ['id',[sequelize.fn('SUM', sequelize.col('price')), 'total_amount']],
+        attributes: ['id', [sequelize.fn('SUM', sequelize.col('price')), 'total_amount']],
         subQuery: false,
     });
 
-    const jobPlainData = jobToPay.get({plain: true});
+    const jobPlainData = jobToPay.get({ plain: true });
 
     if (!jobPlainData.total_amount) return res.status(400).end(`You are not able to deposit money in your balance because you don't have unpaid jobs`)
 
     const {
         total_amount: clientAmountToPay,
-        Contract: { Client: { balance: clientBalance}}
+        Contract: { Client: { balance: clientBalance } }
     } = jobToPay.get({ plain: true });
 
-    const amountToDeposit = Number.parseFloat(( clientAmountToPay / 4).toFixed(2))
+    const amountToDeposit = Number.parseFloat((clientAmountToPay / 4).toFixed(2))
 
-    jobToPay.Contract.Client.update({ balance: clientBalance + amountToDeposit})
+    jobToPay.Contract.Client.update({ balance: clientBalance + amountToDeposit })
 
     res.json(jobToPay);
 });

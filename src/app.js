@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {sequelize} = require('./model')
+const { sequelize } = require('./model')
 const app = express();
 const {
     contractsRouter,

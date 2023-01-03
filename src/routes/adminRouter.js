@@ -1,6 +1,6 @@
 const express = require('express');
 const Sequelize = require('sequelize');
-const {sequelize} = require('../model')
+const { sequelize } = require('../model')
 
 const adminRouter = express.Router();
 
@@ -22,8 +22,8 @@ adminRouter.get('/best-profession', async (req, res) => {
                     paid: true,
                     ...((start || end) ? {
                         paymentDate: {
-                            ...(start ? { [Sequelize.Op.gte]: new Date(start) } : {} ),
-                            ...(end ? { [Sequelize.Op.lte]: new Date(end) } : {} ),
+                            ...(start ? { [Sequelize.Op.gte]: new Date(start) } : {}),
+                            ...(end ? { [Sequelize.Op.lte]: new Date(end) } : {}),
                         }
                     } : {})
                 },
@@ -32,7 +32,7 @@ adminRouter.get('/best-profession', async (req, res) => {
             attributes: [],
         },
         attributes: ['profession', [sequelize.fn('SUM', Sequelize.col('price')), 'total_amount']],
-        group:['profession'],
+        group: ['profession'],
         order: [['total_amount', 'desc']]
     });
 
@@ -58,8 +58,8 @@ adminRouter.get('/best-clients', async (req, res) => {
                     paid: true,
                     ...((start || end) ? {
                         paymentDate: {
-                            ...(start ? { [Sequelize.Op.gte]: new Date(start) } : {} ),
-                            ...(end ? { [Sequelize.Op.lte]: new Date(end) } : {} ),
+                            ...(start ? { [Sequelize.Op.gte]: new Date(start) } : {}),
+                            ...(end ? { [Sequelize.Op.lte]: new Date(end) } : {}),
                         }
                     } : {})
                 },
@@ -68,7 +68,7 @@ adminRouter.get('/best-clients', async (req, res) => {
             attributes: [],
         },
         attributes: ['id', [sequelize.literal("firstName || ' ' || lastName"), 'fullName'], [sequelize.fn('SUM', Sequelize.col('price')), 'paid']],
-        group:['Profile.id'],
+        group: ['Profile.id'],
         order: [['paid', 'desc']],
         limit,
         subQuery: false,
