@@ -119,6 +119,6 @@ The client is a React+Typescript App created by the create-react-app command ins
 - [x] Docs
 
 
-> Thank you!
+> Cheers!
 >
 > -- <cite>Enrique Magallón</cite>
