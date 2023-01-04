@@ -1,126 +1,119 @@
-# DEEL BACKEND TASK
+# 👋 Welcome
 
-  
+This is my implementation of the [Deel Backend Test](./REQUIREMENTS.md).
 
-💫 Welcome! 🎉
+## 📜 Requirements for running the application
 
-
-This backend exercise involves building a Node.js/Express.js app that will serve a REST API. We imagine you should spend around 3 hours at implement this feature.
-
-## Data Models
-
-> **All models are defined in src/model.js**
-
-### Profile
-A profile can be either a `client` or a `contractor`. 
-clients create contracts with contractors. contractor does jobs for clients and get paid.
-Each profile has a balance property.
-
-### Contract
-A contract between and client and a contractor.
-Contracts have 3 statuses, `new`, `in_progress`, `terminated`. contracts are considered active only when in status `in_progress`
-Contracts group jobs within them.
-
-### Job
-contractor get paid for jobs by clients under a certain contract.
-
-## Getting Set Up
-
-  
-The exercise requires [Node.js](https://nodejs.org/en/) to be installed. We recommend using the LTS version.
-
-  
-
-1. Start by cloning this repository.
-
-  
-
-1. In the repo root directory, run `npm install` to gather all dependencies.
-
-  
-
-1. Next, `npm run seed` will seed the local SQLite database. **Warning: This will drop the database if it exists**. The database lives in a local file `database.sqlite3`.
-
-  
-
-1. Then run `npm start` which should start both the server and the React client.
-
-  
-
-❗️ **Make sure you commit all changes to the master branch!**
-
-  
-  
-
-## Technical Notes
-
-  
-
-- The server is running with [nodemon](https://nodemon.io/) which will automatically restart for you when you modify and save a file.
-
-- The database provider is SQLite, which will store data in a file local to your repository called `database.sqlite3`. The ORM [Sequelize](http://docs.sequelizejs.com/) is on top of it. You should only have to interact with Sequelize - **please spend some time reading sequelize documentation before starting the exercise.**
-
-- To authenticate users use the `getProfile` middleware that is located under src/middleware/getProfile.js. users are authenticated by passing `profile_id` in the request header. after a user is authenticated his profile will be available under `req.profile`. make sure only users that are on the contract can access their contracts.
-- The server is running on port 3001.
-
-  
-
-## APIs To Implement 
-
-  
-
-Below is a list of the required API's for the application.
-
-  
+ - You need to have `nodejs v18.12.1` installed.
+ - If you use `nvm`, run `nvm install v18.12.1` (in case you don't have that version installed) and the `nvm use`
 
 
-1. ***GET*** `/contracts/:id` - This API is broken 😵! it should return the contract only if it belongs to the profile calling. better fix that!
+## ▶️ Run the Application
 
-1. ***GET*** `/contracts` - Returns a list of contracts belonging to a user (client or contractor), the list should only contain non terminated contracts.
+If this is the first time you are going to use the App and you want to skip all the detailed steps,
+Run any of the following commands to prepare and run the production version of the application:
 
-1. ***GET*** `/jobs/unpaid` -  Get all unpaid jobs for a user (***either*** a client or contractor), for ***active contracts only***.
 
-1. ***POST*** `/jobs/:job_id/pay` - Pay for a job, a client can only pay if his balance >= the amount to pay. The amount should be moved from the client's balance to the contractor balance.
+⚠️ WARNING!
+Running any of them will drop the database and fill it with the default initial values.
 
-1. ***POST*** `/balances/deposit/:userId` - Deposits money into the the the balance of a client, a client can't deposit more than 25% his total of jobs to pay. (at the deposit moment)
-
-1. ***GET*** `/admin/best-profession?start=<date>&end=<date>` - Returns the profession that earned the most money (sum of jobs paid) for any contactor that worked in the query time range.
-
-1. ***GET*** `/admin/best-clients?start=<date>&end=<date>&limit=<integer>` - returns the clients the paid the most for jobs in the query time period. limit query parameter should be applied, default limit is 2.
-```
- [
-    {
-        "id": 1,
-        "fullName": "Reece Moyer",
-        "paid" : 100.3
-    },
-    {
-        "id": 200,
-        "fullName": "Debora Martin",
-        "paid" : 99
-    },
-    {
-        "id": 22,
-        "fullName": "Debora Martin",
-        "paid" : 21
-    }
-]
+```bash
+npm run plug-and-play
 ```
 
+or
+
+```bash
+yarn plug-and-play
+```
+
+Once you see the log:
+> Express App Listening on Port 8080
+
+open [http://localhost:8080](http://localhost:8080).
+
+<details>
+  <summary>If you see the following app, you are all set 🚀 </summary>
+
+![react-app](./docs-assets/react-app.png)
+
+</details>
+
+<details>
+  <summary>See the detailed explanation of the previous command </summary>
+
+### Commands that run with the `plug-and-play` command
+
+1. `npm install`: This install all the packages needed by the backend
+2. `cd client && npm install`: install the packages used by the frontend application (React App)
+3. `cd client && npm run build`: Creates the static built version of the Frontend, the server will use the folder `./client/build` as the static site for the `/` route
+4. `npm run seed`: This drops the database, then it creates the models and fill them with initial data. The DB is stored in `database.sqlite3`
+5. `cross-env PORT=8080 node ./src/server.js`: This runs the server in the 8080 PORT
+
+</details>
+
+## Structure of the application
+
+### Backend
+
+The backend is an express App that has some endpoints for consulting and updating the database records,
+it follows the next folder structure
+
+```
+|--src
+   |--server.js      # Entry point of the server
+   |--app.js         # Define the express app and routes
+   |--models.js      # Define the tables and relationships for the database
+   |--data           # Contains the initial data of every model
+   |   |--...
+   |
+   |--middleware
+   |   |--getProfile # Middleware to get the current profile info from the database, it uses the header `profile_id`
+   |
+   |--routes         # Every file here defines a subpath of the application, organizing routes by modules.
+       |--...
+```
+
+#### Scripts
+
+ - `npm run seed` or `yarn seed`:  This drops the database, then it creates the models and fill them with initial data. The DB is stored in `database.sqlite3`
+ - `npm run start:prod` or `yarn start:prod`: Runs the server in production mode (port 8080). This server won't be reloaded by changes in files.
+ - `npm run start` or `yarn start`: Runs the server in development mode(port 3001). Every time a file is changed, the server is reloaded
+ - `npm run start:fullstack` or `yarn start:fullstack`: Runs both, the backend (port 3001) and the frontend (port 3000) in development mode in the same terminal.
+ - `npm run test` or `yarn test`: Run backend unit tests using JEST
+ - `npm run coverage` or `yarn coverage`: Run backend tests coverage using JEST, <details><summary> See this example</summary> ![coverage](./docs-assets/coverage.jpg) </details>
   
+#### Bonus points
 
-## Going Above and Beyond the Requirements
+- [x] Concurrency
+- [x] Transactions
+- [x] Unit Tests
+- [x] Docs
 
-Given the time expectations of this exercise, we don't expect anyone to submit anything super fancy, but if you find yourself with extra time, any extra credit item(s) that showcase your unique strengths would be awesome! 🙌
+### Client
 
-It would be great for example if you'd write some unit test / simple frontend demostrating calls to your fresh APIs.
+The client is a React+Typescript App created by the create-react-app command inside `./client` directory
 
+```
+|--client
+    |--build              # Static version of the React App
+    |--src
+        |--index.ts       # Entry point of the client
+        |--app.tsx        # Main component of the React App
+        |--components     # Each folder inside this dir is a component that showcase specific Backend endpoints
+            |--...
+```
+
+#### Scripts
+
+**Important❗** These scripts should be executed inside the `./client` dir
+
+ - `npm run start` or `yarn start`: Runs the client in development mode(port 3000). Every time a file is changed, the app is reloaded.
+ It uses a proxy to make requests to the sever in the 3001 port
+ - `npm run build` or `yarn build`: Creates the static version of the React App
   
+#### Bonus points
 
-## Submitting the Assignment
-
-When you have finished the assignment, create a github repository and send us the link.
-
-  
-
-Thank you and good luck! 🙏
+- [x] Frontend to showcase the Backend
+- [x] Typescript
+- [x] Docs

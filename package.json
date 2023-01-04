@@ -11,9 +11,14 @@
   },
   "scripts": {
     "start": "nodemon ./src/server.js",
+    "start:prod": "cross-env PORT=8080 node ./src/server.js",
+    "start:fullstack": "concurrently  --names \"SERVER,REACT\" -c \"bgBlue.bold,bgMagenta.bold\" \"npm start\" \"cd client && npm start\"",
     "seed": "node ./scripts/seedDb.js",
     "test": "cross-env NODE_ENV=test DB_STORAGE=\"./test-database.sqlite3\" jest --testTimeout=20000 --runInBand",
-    "coverage": "npm run test -- --coverage"
+    "coverage": "npm run test -- --coverage",
+    "predeploy": "cd client && npm run build",
+    "deploy": "npm run seed && npm run start:prod",
+    "plug-and-play": "npm install && cd client && npm install && cd ../ && npm run deploy"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.20.11",
