@@ -30,7 +30,7 @@ jobsRouter.post('/:job_id/pay', async (req, res) => {
     const { job_id: jobId } = req.params;
     const { id: profileId } = req.profile;
     const jobToPay = await Job.findOne({
-        attributes: ['id', 'price', 'paid'],
+        attributes: ['id', 'version', 'price', 'paid'],
         include: {
             model: Contract,
             attributes: ['id'],
@@ -39,14 +39,14 @@ jobsRouter.post('/:job_id/pay', async (req, res) => {
                 sequelize.or({ ContractorId: profileId }, { ClientId: profileId })
             ),
             include: [{
-                attributes: ['id', 'balance'],
+                attributes: ['id', 'version', 'balance'],
                 model: Profile,
                 as: 'Client',
                 where: {
                     id: profileId,
                 }
             }, {
-                attributes: ['id', 'balance'],
+                attributes: ['id', 'version', 'balance'],
                 model: Profile,
                 as: 'Contractor'
             }]
@@ -56,6 +56,7 @@ jobsRouter.post('/:job_id/pay', async (req, res) => {
             paid: sequelize.or(false, 0, null),
         }
     });
+
     if (!jobToPay) return res.status(404).end();
 
     const {
@@ -72,8 +73,8 @@ jobsRouter.post('/:job_id/pay', async (req, res) => {
             await jobToPay.Contract.Contractor.update({ balance: contractorBalance + jobPrice }, { transaction: payTransaction });
         });
     } catch (err) {
-        console.error(err);
-        return res.status(500).end('Service is not working correctly. Retry it later!');
+        res.status(500).json(err);
+        return
     }
 
     res.json(jobToPay)

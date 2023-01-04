@@ -12,6 +12,7 @@ const getExpectedJob = (job, jobId) => ({
     id: jobId,
     paid: null,
     paymentDate: null,
+    version: expect.toBeNumber(),
     ...job,
 })
 
@@ -73,11 +74,13 @@ describe('Jobs API', () => {
                         balance: 949,
                         id: 1,
                         updatedAt: expect.toBeString(),
+                        version: expect.toBeNumber()
                     },
                     Contractor: {
                         balance: 1415,
                         id: 6,
                         updatedAt: expect.toBeString(),
+                        version: expect.toBeNumber()
                     },
                     id: 2,
                 },
@@ -86,6 +89,7 @@ describe('Jobs API', () => {
                 paymentDate: expect.toBeString(),
                 price: 201,
                 updatedAt: expect.toBeString(),
+                version: expect.toBeNumber()
             };
 
             const res1 = await request(app).post(endpoint).set('profile_id', profileId);;
@@ -100,43 +104,106 @@ describe('Jobs API', () => {
             const jobId = 2;
             const profileId = 1;
             const endpoint = getJobsEndpoint(jobId, '/pay');
-            let errorFunc;
             let transaction;
 
             beforeAll(async () => {
                 await resetDatabase();
-                errorFunc = jest.spyOn(console, 'error').mockImplementation(() => { });
                 transaction = jest.spyOn(sequelize, 'transaction').mockImplementation(() => {
                     throw 'Test error';
                 })
             });
 
             beforeEach(() => {
-                errorFunc.mockClear();
                 transaction.mockClear();
             });
 
             afterAll(() => {
-                errorFunc.mockRestore();
                 transaction.mockRestore();
             });
 
-            it('should call log the error correctly', async () => {
-                expect(errorFunc).not.toHaveBeenCalled();
-
-                await request(app).post(endpoint).set('profile_id', profileId);
-
-                expect(errorFunc).toHaveBeenCalledTimes(1);
-                expect(errorFunc).toHaveBeenCalledWith('Test error');
-            });
-
             it('should return status code 500 and the correct error message', async () => {
-                const expectedErrorMessage = 'Service is not working correctly. Retry it later!';
+                const expectedErrorMessage = JSON.stringify('Test error');
 
                 const res = await request(app).post(endpoint).set('profile_id', profileId);
 
                 expect(res.statusCode).toBe(500);
                 expect(res.text).toBe(expectedErrorMessage);
+            });
+        });
+
+        describe('Concurrency: When 2 calls to the same endpoint are made simultaneously', () => {
+            beforeAll(async () => {
+                await resetDatabase();
+            });
+
+            it('one response should be correct and the other should send a 500 error', async () => {
+                const jobId = 2;
+                const profileId = 1;
+                const endpoint = getJobsEndpoint(jobId, '/pay');
+                const successfulResponse = {
+                    Contract: {
+                        Client: {
+                            balance: 949,
+                            id: 1,
+                            updatedAt: expect.toBeString(),
+                            version: expect.toBeNumber()
+                        },
+                        Contractor: {
+                            balance: 1415,
+                            id: 6,
+                            updatedAt: expect.toBeString(),
+                            version: expect.toBeNumber()
+                        },
+                        id: 2,
+                    },
+                    id: 2,
+                    paid: true,
+                    paymentDate: expect.toBeString(),
+                    price: 201,
+                    updatedAt: expect.toBeString(),
+                    version: expect.toBeNumber()
+                };
+
+                const errorResponse = {
+                    name: 'SequelizeOptimisticLockError',
+                    modelName: 'Job',
+                    values: {
+                        paid: true,
+                        paymentDate: expect.toBeString(),
+                        updatedAt: expect.toBeString(),
+                        version: expect.toBeNumber()
+                    },
+                    where: { id: 2, version: expect.toBeNumber() }
+                };
+
+                const hasSuccessfulResponse = res => {
+                    try {
+                        expect(res.status).toBe(200);
+                        expect(res.body).toEqual(successfulResponse);
+                    } catch {
+                        return false;
+                    }
+                    return true;
+                }
+    
+                const hasErrorResponse = res => {
+                    try {
+                        expect(res.status).toBe(500);
+                        expect(res.body).toEqual(errorResponse);
+                    } catch {
+                        return false;
+                    }
+                    return true;
+                }
+
+                const res1Call = request(app).post(endpoint).set('profile_id', profileId);;
+                const res2Call = request(app).post(endpoint).set('profile_id', profileId);;
+
+                const responses = (await Promise.allSettled([res1Call, res2Call])).map(({ value }) => value);
+
+                expect(responses).toBeArrayOfSize(2);
+                expect(responses).toSatisfyAny(hasSuccessfulResponse);
+                expect(responses).toSatisfyAny(hasErrorResponse);
             });
         });
     });

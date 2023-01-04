@@ -17,6 +17,11 @@ Profile.init(
       type: Sequelize.STRING,
       allowNull: false
     },
+    version: {
+      allowNull: false,
+      type: Sequelize.DataTypes.INTEGER,
+      defaultValue: 0
+    },
     lastName: {
       type: Sequelize.STRING,
       allowNull: false
@@ -34,7 +39,8 @@ Profile.init(
   },
   {
     sequelize,
-    modelName: 'Profile'
+    modelName: 'Profile',
+    version: true,
   }
 );
 
@@ -45,13 +51,19 @@ Contract.init(
       type: Sequelize.TEXT,
       allowNull: false
     },
+    version: {
+      allowNull: false,
+      type: Sequelize.DataTypes.INTEGER,
+      defaultValue: 0
+    },
     status: {
       type: Sequelize.ENUM('new', 'in_progress', 'terminated')
     }
   },
   {
     sequelize,
-    modelName: 'Contract'
+    modelName: 'Contract',
+    version: true,
   }
 );
 
@@ -61,6 +73,11 @@ Job.init(
     description: {
       type: Sequelize.TEXT,
       allowNull: false
+    },
+    version: {
+      allowNull: false,
+      type: Sequelize.DataTypes.INTEGER,
+      defaultValue: 0
     },
     price: {
       type: Sequelize.DECIMAL(12, 2),
@@ -76,7 +93,8 @@ Job.init(
   },
   {
     sequelize,
-    modelName: 'Job'
+    modelName: 'Job',
+    version: true,
   }
 );
 

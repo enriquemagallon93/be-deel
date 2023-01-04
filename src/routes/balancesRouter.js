@@ -53,9 +53,12 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
     } = jobToPay.get({ plain: true });
 
     const amountToDeposit = roundToCents(clientAmountToPay / 4);
-    console.log({amountToDeposit});
-
-    jobToPay.Contract.Client.update({ balance: roundToCents(clientBalance + amountToDeposit) })
+    try {
+        await jobToPay.Contract.Client.update({ balance: roundToCents(clientBalance + amountToDeposit) })
+    } catch(err){
+        res.status(500).json(err);
+        return;
+    }
 
     res.json(jobToPay);
 });

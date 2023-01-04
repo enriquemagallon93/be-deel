@@ -8,6 +8,7 @@ const getExpectedContract = contract => ({
     ...contract,
     createdAt: expect.toBeString(),
     updatedAt: expect.toBeString(),
+    version: expect.toBeNumber(),
 });
 
 describe('Contracts API', () => {
