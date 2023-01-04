@@ -77,7 +77,7 @@ const Jobs = () => {
                         <tr key={id}>
                             <td>{id}</td>
                             <td>{description}</td>
-                            <td>{price}</td>
+                            <td>${price}</td>
                             <td>{ContractId}</td>
                             {profileData?.currentProfile.type === 'client' ? <td><button className="button" onClick={() => {payJob(id)}}>Pay</button></td> : <></>}
                         </tr>

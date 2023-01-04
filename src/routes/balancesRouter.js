@@ -2,6 +2,7 @@ const express = require('express');
 const Sequelize = require('sequelize');
 const { sequelize } = require('../model')
 const { getProfile } = require('../middleware/getProfile');
+const roundToCents = require('../tools/round-to-cents');
 
 const balancesRouter = express.Router();
 
@@ -51,9 +52,10 @@ balancesRouter.post('/deposit/:userId', getProfile, async (req, res) => {
         Contract: { Client: { balance: clientBalance } }
     } = jobToPay.get({ plain: true });
 
-    const amountToDeposit = Number.parseFloat((clientAmountToPay / 4).toFixed(2))
+    const amountToDeposit = roundToCents(clientAmountToPay / 4);
+    console.log({amountToDeposit});
 
-    jobToPay.Contract.Client.update({ balance: clientBalance + amountToDeposit })
+    jobToPay.Contract.Client.update({ balance: roundToCents(clientBalance + amountToDeposit) })
 
     res.json(jobToPay);
 });

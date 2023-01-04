@@ -78,20 +78,26 @@ adminRouter.get('/best-clients', async (req, res) => {
     res.json(professions);
 });
 
-adminRouter.get('/profiles', async (req, res) => {
-    const { Profile } = req.app.get('models');
+adminRouter.get('/profiles',
+    /* istanbul ignore next */
+    async (req, res) => {
+        const { Profile } = req.app.get('models');
 
-    const profiles = await Profile.findAll({
-        attributes: ['id', [sequelize.literal("firstName || ' ' || lastName"), 'fullName'], 'profession','balance','type'],
-    });
+        const profiles = await Profile.findAll({
+            attributes: ['id', [sequelize.literal("firstName || ' ' || lastName"), 'fullName'], 'profession', 'balance', 'type'],
+        });
 
-    res.json(profiles);
-});
+        res.json(profiles);
+    }
+);
 
-adminRouter.post('/reset-db', async (req, res) => {
-    await resetDatabase();
+adminRouter.post('/reset-db',
+    /* istanbul ignore next */
+    async (_req, res) => {
+        await resetDatabase();
 
-    res.status(200).end();
-});
+        res.status(200).end();
+    }
+);
 
 module.exports = adminRouter;

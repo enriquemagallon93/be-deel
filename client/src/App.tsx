@@ -1,3 +1,6 @@
+import BestClients from './components/BestClients';
+import BestProfessions from './components/BestProfessions';
+import ContractById from './components/ContractById';
 import Contracts from './components/Contracts';
 import Hero from './components/Hero';
 import Jobs from './components/Jobs';
@@ -11,9 +14,14 @@ function App() {
         <Hero />
         <br />
         <UsersSelector />
-        <br />
+        <ContractById />
         <Contracts />
         <Jobs />
+        <br />
+        <BestProfessions />
+        <br />
+        <BestClients />
+        <br />
       </ProfilesProvider>
     </div>
   );

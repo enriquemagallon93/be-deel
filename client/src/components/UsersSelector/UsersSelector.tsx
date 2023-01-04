@@ -65,7 +65,7 @@ const UsersSelector = () => {
                                     </select>
                                 </td>
                                 <td>{currentProfile.profession}</td>
-                                <td>{currentProfile.balance}</td>
+                                <td>${currentProfile.balance}</td>
                                 <td>{currentProfile.type}</td>
                                 {currentProfile.type === 'client' ? <td><button className="button" onClick={depositMoney}>Deposit Money</button></td> : <></>}
                             </tr>

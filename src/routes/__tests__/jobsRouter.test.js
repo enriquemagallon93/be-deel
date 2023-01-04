@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../app');
 const jobs = require('../../data/jobs');
 const { sequelize } = require('../../model');
-const { default: resetDatabase } = require('../../tools/reset-database');
+const resetDatabase = require('../../tools/reset-database');
 
 const getJobsEndpoint = (jobId, subpath = '') => `/jobs${jobId !== undefined ? `/${jobId}` : ''}${subpath}`;
 
